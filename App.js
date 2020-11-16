@@ -10,7 +10,7 @@ import ProfileView from './ProfileView'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 import { TouchableOpacity, Image, View, Text } from 'react-native';
 
@@ -29,6 +29,7 @@ class App extends React.Component {
     this.SignoutButton = this.SignoutButton.bind(this);
   }
 
+  
   /**
    * Store the username and accessToken here so that it can be
    * passed down to each corresponding child view.
@@ -55,11 +56,70 @@ class App extends React.Component {
   SignoutButton = () => {
     return <>
       <View style={{ flexDirection: 'row', marginRight: 25 }}>
-        <TouchableOpacity onPress={() => alert("We should probably change this to log us out! An icon would be nice too!")}>
-          <Text> X</Text>
+        <TouchableOpacity onPress={() => this.revokeAccessToken()}>
+        <Icon name="sign-out-alt" size={40} color="#900" style={{ marginRight: 20 }} />
         </TouchableOpacity>
       </View>
     </>
+  }
+
+
+  // list of tabs for the Today, Exercises, and Profile views.
+
+  UserTabs = () => {
+    const BottomTabs = createBottomTabNavigator();
+    return (
+      <BottomTabs.Navigator
+       tabBarOptions = {{
+         inactiveTintColor: 'gray',
+         activeTintColor: 'tomato',
+       }}>
+      
+      <BottomTabs.Screen
+        name = 'Today'
+        options={{
+      
+          tabBarLabel: 'Today',
+          tabBarOptions: {
+            inactiveTintColor: 'gray',
+            activeTintColor: 'tomato',
+          },
+          animationEnabled: true,
+        }}>
+          {(props) => <TodayView {...props} tok={this.state.accessToken} user={this.state.username} />}
+         </BottomTabs.Screen> 
+
+        <BottomTabs.Screen
+        name = 'Exercises'
+        options={{
+          tabBarLabel: 'Exercises',
+          tabBarOptions: {
+            inactiveTintColor: 'gray',
+            activeTintColor: 'tomato',
+          },
+          animationEnabled: true,
+        }} >
+
+          {(props) => <ExercisesView {...props} tok={this.state.accessToken} user={this.state.username} />}
+       </BottomTabs.Screen> 
+
+        <BottomTabs.Screen
+        name = 'Profile'
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarOptions: {
+            inactiveTintColor: 'gray',
+            activeTintColor: 'tomato',
+          },
+          animationEnabled: true,
+        }}>
+          {(props) => <ProfileView {...props} accessToken={this.state.accessToken} username={this.state.username} />}
+       </BottomTabs.Screen> 
+
+       </BottomTabs.Navigator>
+    )
+
+
   }
 
   /**
@@ -83,6 +143,7 @@ class App extends React.Component {
     // need to specify another set of screens or navigator; e.g. a
     // list of tabs for the Today, Exercises, and Profile views.
     let AuthStack = createStackNavigator();
+    
 
     return (
       <NavigationContainer>
@@ -109,11 +170,11 @@ class App extends React.Component {
             </>
           ) : (
               <>
-                <AuthStack.Screen name="FitnessTracker" options={{
+                <AuthStack.Screen name="FitnessTracker" 
+                 component = {this.UserTabs}
+                 options={{
                   headerLeft: this.SignoutButton
-                }}>
-                  {(props) => <ProfileView {...props} username={this.state.username} accessToken={this.state.accessToken} revokeAccessToken={this.revokeAccessToken} />}
-                </AuthStack.Screen>
+                }} />
               </>
 
             )}
